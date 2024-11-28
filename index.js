@@ -78,7 +78,7 @@ app.put('/api/notes/:id',(request,response) => {
         .then(result => {
             response.json(result)
         })
-        .catch(error => next(error))
+        // .catch(error => next(error))
 })
 
 const PORT= process.env.PORT
