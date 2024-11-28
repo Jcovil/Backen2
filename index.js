@@ -20,52 +20,55 @@ app.use(requestLogger)
 
 let notes = []
 
-app.get('/', (request, response) => {
-    response.send('<h1>API REST FROM NOTES</h1>');
-});
-
-app.get('/api/notes', (request, response) => {
+app.get('/',(request,response) => {
+    response.send('<h1>API REST FROM NOTES</h1>')
+})
+//Regresa todos
+app.get('/api/notes',(request,response) => {
     Note.find({}).then(notes => {
-        response.json(notes);
+        response.json(notes)
     })
-});
-
-app.get('/api/notes/:id', (request, response) => {
+})
+//Buscar uno solo
+app.get('/api/notes/:id',(request,response) => {
     Note.findById(request.params.id)
-    .then(note => {
-        if(note) {
-         response.json(note)
-        }else {
-            response.status(404).end()
-        }
-    })
-    .catch(error => {
-        console.log(error)
-        response.status(400).send({error:'malformated id'})
-    })
-});
+        .then(note => {
+            if (note) {
+            response.json(note)
+            }
+            else {
+                response.status(404).end()
+            }
+        })
+        .catch(error => {
+            console.log(error);
+            response.status(400).send({error: 'malformated id'})
+        })
+})
+//Borrar uno
+app.delete('/api/notes/:id',(request,response) => {
+    const id = Number(request.params.id)
+    //console.log('Delete id:', id);
+    notes=notes.filter(n => n.id !== id)
+    response.status(204).end()
+})
 
-app.delete('/api/notes/:id', (request, response) => {
-    const id = Number(request.params.id);
-    notes = notes.filter(n => n.id !== id);
-    response.status(204).end();
-});
-
-app.post('/api/notes', (request, response) => {
-    const body = request.body;
+//Agregar uno
+app.post('/api/notes',(request,response) => {
+    const body = request.body
     if (!body.content) {
         return response.status(400).json({
             error: 'content missing'
-        });
+        })
     }
-    const note = new Note ({
+    const note = new Note( {
         content: body.content,
-        important: body.important || false
+        important: Boolean(body.important) || false
     })
-    note.save().then(result => response.json(result))
-});
+    note.save().then(result => response.json(note))
+})
 
-app.put('/api/notes/:id', (request, response) => {
+app.put('/api/notes/:id',(request,response) => {
     const body = request.body
     const note = {
         content: body.content,
@@ -76,9 +79,9 @@ app.put('/api/notes/:id', (request, response) => {
             response.json(result)
         })
         .catch(error => next(error))
-});
+})
 
-const PORT = process.env.PORT || 3001;
-app.listen(PORT, () => {
-    console.log(`Server Express Running On Port ${PORT}`);
-});
+const PORT= process.env.PORT
+app.listen(PORT, ()=> {
+    console.log(`Server express running on port ${PORT}`);
+})
