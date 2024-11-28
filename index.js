@@ -46,13 +46,6 @@ app.delete('/api/notes/:id', (request, response) => {
     response.status(204).end();
 });
 
-const generateId = () => {
-    const maxId = notes.length > 0
-        ? Math.max(...notes.map(n => n.id))
-        : 0;
-    return maxId + 1;
-};
-
 app.post('/api/notes', (request, response) => {
     const body = request.body;
     if (!body.content) {
@@ -60,13 +53,11 @@ app.post('/api/notes', (request, response) => {
             error: 'content missing'
         });
     }
-    const note = {
-        id: generateId(),
+    const note = new Note ({
         content: body.content,
-        important: Boolean(body.important) || false
-    };
-    notes = notes.concat(note);
-    response.json(note);
+        important: body.important || false
+    })
+    note.save().then(result => response.json(result))
 });
 
 app.put('/api/notes/:id', (request, response) => {
