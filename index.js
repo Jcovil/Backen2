@@ -31,13 +31,18 @@ app.get('/api/notes', (request, response) => {
 });
 
 app.get('/api/notes/:id', (request, response) => {
-    const id = Number(request.params.id);
-    const note = notes.find(n => n.id === id);
-    if (note) {
-        response.json(note);
-    } else {
-        response.status(404).end();
-    }
+    Note.findById(request.params.id)
+    .then(note => {
+        if(note) {
+         response.json(note)
+        }else {
+            response.status(404).end()
+        }
+    })
+    .catch(error => {
+        console.log(error)
+        response.status(400).send({error:'malformated id'})
+    })
 });
 
 app.delete('/api/notes/:id', (request, response) => {
@@ -61,22 +66,16 @@ app.post('/api/notes', (request, response) => {
 });
 
 app.put('/api/notes/:id', (request, response) => {
-    const id = Number(request.params.id);
-    const body = request.body;
-
-    const note = notes.find(n => n.id === id);
-    if (!note) {
-        return response.status(404).json({ error: 'note not found' });
+    const body = request.body
+    const note = {
+        content: body.content,
+        important: body.important
     }
-
-    const updatedNote = {
-        ...note,
-        content: body.content || note.content,
-        important: body.important !== undefined ? body.important : note.important
-    };
-
-    notes = notes.map(n => n.id !== id ? n : updatedNote);
-    response.json(updatedNote);
+    Note.findByIdAndUpdate(request.params.id,note,{new:true})
+    .then(result => {
+        response.json(result)
+    })
+    .catch(error => next(error))
 });
 
 const PORT = process.env.PORT || 3001;
