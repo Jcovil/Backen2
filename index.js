@@ -72,10 +72,10 @@ app.put('/api/notes/:id', (request, response) => {
         important: body.important
     }
     Note.findByIdAndUpdate(request.params.id,note,{new:true})
-    .then(result => {
-        response.json(result)
-    })
-    .catch(error => next(error))
+        .then(result => {
+            response.json(result)
+        })
+        .catch(error => next(error))
 });
 
 const PORT = process.env.PORT || 3001;
