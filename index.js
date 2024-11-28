@@ -1,45 +1,33 @@
-const express = require('express');
+require('dotenv').config()
+const express = require('express')
 const cors = require('cors')
-const app = express();
+const app=express()
+const Note = require('./models/note')
 
-app.use(express.json());
+app.use(express.json())
 app.use(cors())
 app.use(express.static('dist'))
 
-const requestLogger = (request, response, next) => {
-    console.log('Method:', request.method);
-    console.log('Path:', request.path);
-    console.log('Body:', request.body);
+const requestLogger=(request, response, next) =>{
+    console.log('Method', request.method);
+    console.log('Path', request.path);
+    console.log('Body', request.body);
     console.log('---');
-    next();
-};
+    next()
+}
 
-app.use(requestLogger);
+app.use(requestLogger)
 
-let notes = [
-    {
-        id: 1,
-        content: 'HTML Is Easy',
-        important: true
-    },
-    {
-        id: 2,
-        content: 'Browser Can Execute Only JavaScript',
-        important: false
-    },
-    {
-        id: 3,
-        content: 'Get And Post Are The Most Important Methods Of HTTP Protocol',
-        important: true
-    }
-];
+let notes = []
 
 app.get('/', (request, response) => {
     response.send('<h1>API REST FROM NOTES</h1>');
 });
 
 app.get('/api/notes', (request, response) => {
-    response.json(notes);
+    Note.find({}).then(notes => {
+        response.json(notes);
+    })
 });
 
 app.get('/api/notes/:id', (request, response) => {
